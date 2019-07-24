@@ -86,12 +86,18 @@ defmodule CredoReportCard.Formatter do
     15 * sev
   end
 
-  #  defp issue_score(%Issue{check: Credo.Check.Warning.ExCoverallsUncovered, severity: sev}) do
-  #  10 * sev
-  # end
-
   defp issue_score(issue) do
-    @issue_remediation[issue.check] || 5
+    case Map.has_key?(@issue_remediation, issue.check) do
+      false -> lookup_score_for_issue(issue)
+      _ -> @issue_remediation[issue.check]
+    end
+  end
+
+  defp lookup_score_for_issue(issue) do
+    case function_exported?(issue.check, :score_issue, 1) do
+      false ->  5
+      _ -> issue.check.score_issue(issue)
+    end
   end
 
   defp single_decimal_string_from(val) do
