@@ -25,12 +25,10 @@ defmodule CredoReportCard.Formatter do
 
   def score_issues(_, issues) do
     issue_count = Enum.count(issues)
-
     total =
       Enum.reduce(issues, 0.0, fn issue, acc ->
         acc + issue_score(issue)
       end)
-
     {issue_count, Float.ceil(total, 2)}
   end
 
@@ -94,9 +92,10 @@ defmodule CredoReportCard.Formatter do
   end
 
   defp lookup_score_for_issue(issue) do
-    case function_exported?(issue.check, :score_issue, 1) do
+    case function_exported?(issue.check, :report_card_score, 1) do
       false ->  5
-      _ -> issue.check.score_issue(issue)
+      _ ->
+        issue.check.report_card_score(issue)
     end
   end
 
